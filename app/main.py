@@ -346,10 +346,10 @@ class App(tk.Frame):
         self.timer_info_server_name.config(text=server_name)
 
         # Настройки виджетов таймера
-        timer_day = True if self.timer_time_var.get() else False
-        timer_night = True if not self.timer_time_var.get() else False
-        timer_event_start = True if self.timer_event_var.get() else False
-        timer_event_end = True if not self.timer_event_var.get() else False
+        timer_day = self.timer_time_var.get()
+        timer_night = not timer_day
+        timer_event_start = self.timer_event_var.get()
+        timer_event_end = not timer_event_start
         timer_use_current_time = True if self.timer_current_time_var.get() else False
         timer_queue = int(self.timer_queue_combobox.get())
 
