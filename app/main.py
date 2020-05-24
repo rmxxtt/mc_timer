@@ -66,7 +66,9 @@ class App(tk.Frame):
         canvas_animate_checkbutton = ttk.Checkbutton(text="Включить анимацию",
                                                      variable=self.canvas_animate_var, onvalue=1, offvalue=0)
 
-        # Канвас
+        # <<< Место для Канваса
+
+        sep = ttk.Separator(orient="horizontal")
 
         # Таймер: Включить, выключить
         self.timer_thred_id = 0
@@ -137,12 +139,13 @@ class App(tk.Frame):
         self.get_server_update_button.grid(row=1, column=0, padx=10, pady=10, ipadx=10, ipady=10, sticky="wen")
         canvas_animate_checkbutton.grid(row=2, column=0, padx=10, pady=10, sticky="s")
         # <<< Место для Канваса
-        self.timer_start_button.grid(row=3, column=0, columnspan=1, padx=10, pady=(10, 5),
+        sep.grid(row=3, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
+        self.timer_start_button.grid(row=4, column=0, columnspan=1, padx=10, pady=(10, 5),
                                      ipadx=10, ipady=10, sticky="we")
-        self.timer_stop_button.grid(row=4, column=0, columnspan=1, padx=10, pady=(5, 10),
+        self.timer_stop_button.grid(row=5, column=0, columnspan=1, padx=10, pady=(5, 10),
                                     ipadx=10, ipady=10, sticky="we")
         # Фрейм
-        timer_labelframe.grid(row=3, column=1, rowspan=2, pady=10, padx=10, sticky="snwe")
+        timer_labelframe.grid(row=4, column=1, rowspan=2, pady=10, padx=10, sticky="snwe")
         timer_info_label_number_days_or_nights.grid(row=0, column=0, pady=(10, 0), padx=10, sticky="e")
         timer_info_label_time_left.grid(row=1, column=0, columnspan=1, pady=(0, 0), padx=10, sticky="e")
         timer_info_label_server_name.grid(row=2, column=0, columnspan=1, pady=(0, 10), padx=10, sticky="e")
