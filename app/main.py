@@ -277,7 +277,7 @@ class App(tk.Frame):
             self.alert("Ошибка", "Получены неверные данные.", error)
             return None
         # За каждую секунду ожидания ответа добавляем 20 тиков
-        if delay := (time.time() - time_start) // 1 > 0:
+        if (delay := int(time.time() - time_start) / 1) > 0:
             server_time += delay * 20
         return dict(time=server_time, server=server_name)
 
