@@ -9,6 +9,7 @@ import json
 import time
 import platform
 import webbrowser
+import collections
 
 # Звуковое оповещение, доступно только под Windows
 WINSOUND = False
@@ -183,6 +184,16 @@ class App(tk.Frame):
         # Показываем готовое окно
         self.master.deiconify()
 
+        # Очередь для выполенения функций в главном потоке
+        self.mainloop_deque = collections.deque()
+        self.master.after(500, self.mainloop_deque_check)
+
+    def mainloop_deque_check(self):
+        if self.mainloop_deque:
+            event = self.mainloop_deque.popleft()
+            event[0](*event[1::])
+        self.master.after(500, self.mainloop_deque_check)
+
     def get_server(self):
         self.get_server_update_button.config(state="disabled")
         self.get_server_thred_id += 1
@@ -271,13 +282,13 @@ class App(tk.Frame):
             data = json.loads(result.read())
             server_time = int(data["time"])
         except socket.timeout as error:
-            self.alert("Ошибка", "Время ожидания превышено.", error)
+            self.mainloop_deque.append([self.alert, "Ошибка", "Время ожидания превышено.", error])
             return None
         except ConnectionError as error:
-            self.alert("Ошибка", "Сервер не отвечает. Попробуйте позже.", error)
+            self.mainloop_deque.append([self.alert, "Ошибка", "Сервер не отвечает. Попробуйте позже.", error])
             return None
         except (json.JSONDecodeError, KeyError, ValueError) as error:
-            self.alert("Ошибка", "Получены неверные данные.", error)
+            self.mainloop_deque.append([self.alert, "Ошибка", "Получены неверные данные.", error])
             return None
         # За каждую секунду ожидания ответа добавляем 20 тиков
         if (delay := int(time.time() - time_start) / 1) > 0:
@@ -291,18 +302,18 @@ class App(tk.Frame):
             else:
                 winsound.PlaySound("SystemExclamation", winsound.SND_ASYNC)
         alert = tk.Toplevel(self.master)
-        alert.attributes('-alpha', 0.0)
+        alert.withdraw()
         alert.resizable(False, False)
         alert.title(title)
         alert.grab_set()  # Модальное окно
         msg = ttk.Label(alert, text=message, anchor="center")
-        msg.grid(padx=20, pady=20, sticky="we")
+        msg.grid(row=0, column=0, padx=20, pady=20, sticky="we")
         if error:
             err = ttk.Label(alert, text=f"{error}", anchor="center")
-            err.grid(padx=20, pady=(0, 20), sticky="we")
+            err.grid(row=1, column=0, columnspan=1, padx=20, pady=(0, 20), sticky="we")
         quit_ = ttk.Button(alert, text="Закрыть окно", width=40, command=lambda: alert.destroy())
-        quit_.grid(padx=10, pady=10, ipadx=10, ipady=10, sticky="we")
-        alert.attributes('-alpha', 1.0)
+        quit_.grid(row=2, column=0, padx=10, pady=10, ipadx=10, ipady=10, sticky="we")
+        alert.deiconify()
 
     def timer_start(self):
         self.timer_gui_state_off()
@@ -441,23 +452,23 @@ class App(tk.Frame):
             if timer_day:
                 if timer_event_start:
                     if days_started == number_events:
-                        self.alert("Таймер", "Начало дня. Время действовать!")
+                        self.mainloop_deque.append([self.alert, "Таймер", "Начало дня. Время действовать!"])
                         self.timer_stop()
                         return
                 elif timer_event_end:
                     if days_ended == number_events:
-                        self.alert("Таймер", "Конец дня. Время действовать!")
+                        self.mainloop_deque.append([self.alert, "Таймер", "Конец дня. Время действовать!"])
                         self.timer_stop()
                         return
             elif timer_night:
                 if timer_event_start:
                     if nights_started == number_events:
-                        self.alert("Таймер", "Начало ночи. Время действовать!")
+                        self.mainloop_deque.append([self.alert, "Таймер", "Начало ночи. Время действовать!"])
                         self.timer_stop()
                         return
                 elif timer_event_end:
                     if nights_ended == number_events:
-                        self.alert("Таймер", "Конец ночи. Время действовать!")
+                        self.mainloop_deque.append([self.alert, "Таймер", "Конец ночи. Время действовать!"])
                         self.timer_stop()
                         return
 
