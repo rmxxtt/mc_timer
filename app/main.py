@@ -291,7 +291,7 @@ class App(tk.Frame):
             else:
                 winsound.PlaySound("SystemExclamation", winsound.SND_ASYNC)
         alert = tk.Toplevel(self.master)
-        alert.withdraw()
+        alert.attributes('-alpha', 0.0)
         alert.resizable(False, False)
         alert.title(title)
         alert.grab_set()  # Модальное окно
@@ -302,7 +302,7 @@ class App(tk.Frame):
             err.grid(padx=20, pady=(0, 20), sticky="we")
         quit_ = ttk.Button(alert, text="Закрыть окно", width=40, command=lambda: alert.destroy())
         quit_.grid(padx=10, pady=10, ipadx=10, ipady=10, sticky="we")
-        alert.deiconify()
+        alert.attributes('-alpha', 1.0)
 
     def timer_start(self):
         self.timer_gui_state_off()
